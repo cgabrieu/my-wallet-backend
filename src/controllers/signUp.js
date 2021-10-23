@@ -10,7 +10,11 @@ export async function postSignUp(req, res) {
         if ((validateSignUp.validate(req.body)).error) 
             return res.status(400).send("Dados inválidos.");
 
-        const hasUser = await connection.query(`SELECT * FROM users WHERE email = $1;`, [email]);
+        const hasUser = await connection.query(`
+            SELECT * FROM users
+            WHERE email = $1;`,
+            [email]
+        );
         if (hasUser.rowCount > 0) return res.status(409).send("Usuário já existente.");
 
         const hashPassword = bcrypt.hashSync(password, 10);
@@ -27,5 +31,4 @@ export async function postSignUp(req, res) {
         console.log(error);
         res.status(500);
     }
-
 }
