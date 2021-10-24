@@ -27,7 +27,12 @@ export async function postSignIn(req, res) {
                 VALUES ($1, $2);`,
                 [user.id, token]
             );
-            res.status(200).send(token);
+            res.status(200).send({
+                userId: user.id,
+                name: user.name,
+                email,
+                token,
+            });
         } else {
             res.status(401).send("E-mail ou senha inválidos.");
         }

@@ -21,7 +21,6 @@ export async function postNewTransaction(req, res) {
         if (session.rowCount === 0)
             return res.status(401).send("Você foi desconectado.");
 
-
         const userId = session.rows[0].userId;
         await connection.query(`
             INSERT INTO transactions

@@ -14,12 +14,12 @@ app.use(cors());
 app.use(express.json());
 
 //SIGN-IN-&-UP
-app.post('/sign-up', postSignUp);
-app.post('/sign-in', postSignIn);
+app.post('/api/auth/signup', postSignUp);
+app.post('/api/auth/signin', postSignIn);
 
 //TRANSACTIONS
-app.post('/transactions', postNewTransaction);
-app.get('/transactions', getTransactions);
+app.post('/api/transactions', postNewTransaction);
+app.get('/api/transactions', getTransactions);
 
 app.listen(process.env.SERVER_PORT, () => {
     console.log(`Server running on port ${process.env.SERVER_PORT}`);
