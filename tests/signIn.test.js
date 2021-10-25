@@ -49,6 +49,30 @@ describe("POST /api/auth/signin", () => {
 		expect(result.status).toEqual(400);
 	});
 
+	it("returns status 401 for invalid password", async () => {
+		const newUser = await createUser();
+
+		const bodyData = {
+			email: newUser.email,
+			password: newUser.password + "WRONG"
+		};
+		
+		const result = await request.post("/api/auth/signin").send(bodyData);
+	
+		expect(result.status).toEqual(401);
+	});
+
+	it("returns status 401 for invalid email", async () => {
+		const bodyData = {
+			email: "qualquercoisa@email.com",
+			password: "SenhaQuePassaNoTesteDeForça@123"
+		};
+		
+		const result = await request.post("/api/auth/signin").send(bodyData);
+	
+		expect(result.status).toEqual(401);
+	});
+
 	it("creates a session for valid access", async () => {
 		const newUser = await createUser();
 
