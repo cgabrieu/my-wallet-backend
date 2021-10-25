@@ -8,7 +8,7 @@ export async function postSignUp(req, res) {
         const { name, email, password } = req.body;
 
         if ((validateSignUp.validate(req.body)).error) 
-            return res.status(400).send("Dados inválidos.");
+            return res.status(400).send("Sua senha precisa ser mais forte.");
 
         const hasUser = await connection.query(`
             SELECT * FROM users
