@@ -24,7 +24,6 @@ export async function getTransactions(req, res) {
 
         res.status(200).send(result.rows);
     } catch (error) {
-        console.log(error);
         res.status(500);
     }
 }

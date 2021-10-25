@@ -2,7 +2,7 @@ import connection from "../database/database.js";
 import { v4 as uuid } from 'uuid';
 import bcrypt from 'bcrypt';
 
-import { validateSignIn } from "../validation/signIn.js";
+import { validateSignIn } from "../validations/signIn.js";
 
 export async function postSignIn(req, res) {
     try {

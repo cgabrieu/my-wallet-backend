@@ -1,6 +1,6 @@
 import connection from "../database/database.js";
 
-import { validateTransaction } from "../validation/transaction.js";
+import { validateTransaction } from "../validations/transaction.js";
 
 export async function postNewTransaction(req, res) {
     try {
@@ -35,7 +35,6 @@ export async function postNewTransaction(req, res) {
         });
 
     } catch (error) {
-        console.log(error);
         res.status(500);
     }
 }

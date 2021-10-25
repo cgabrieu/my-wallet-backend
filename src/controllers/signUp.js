@@ -1,7 +1,7 @@
 import connection from "../database/database.js";
 import bcrypt from 'bcrypt';
 
-import { validateSignUp } from "../validation/signUp.js";
+import { validateSignUp } from "../validations/signUp.js";
 
 export async function postSignUp(req, res) {
     try {
@@ -28,7 +28,6 @@ export async function postSignUp(req, res) {
         
         res.status(201).send("Conta criada com sucesso.");
     } catch (error) {
-        console.log(error);
         res.status(500);
     }
 }
