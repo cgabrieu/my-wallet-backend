@@ -1,112 +1,111 @@
-import connection from '../src/database/database.js';
+/* eslint-disable no-undef */
 import bcrypt from 'bcrypt';
-import app from '../src/app.js'
-import supertest from 'supertest';
 import faker from 'faker/locale/pt_BR';
+import supertest from 'supertest';
+import app from '../src/app.js';
+import connection from '../src/database/database.js';
 
 const request = supertest(app);
 
+// eslint-disable-next-line no-undef
 afterAll(() => {
-	connection.end();
+  connection.end();
 });
 
+// eslint-disable-next-line no-undef
 beforeEach(async () => {
-	await connection.query(`DELETE FROM users;`);
-	await connection.query(`DELETE FROM sessions;`);
+  await connection.query('DELETE FROM users;');
+  await connection.query('DELETE FROM sessions;');
 });
 
 async function createUser() {
-	const pass = faker.internet.password(8);
-	const hash = bcrypt.hashSync(pass, 10);
+  const pass = faker.internet.password(8);
+  const hash = bcrypt.hashSync(pass, 10);
 
-	const newUser = await connection.query(`
-		INSERT INTO users (name, email, password) 
-		VALUES ($1, $2, $3) 
-		RETURNING email, password;`,
-		[faker.name.findName(), faker.internet.email(), hash]
-	);
-	newUser.rows[0].password = pass;
-	return newUser.rows[0];
+  const newUser = await connection.query(
+    `INSERT INTO users (name, email, password) 
+    VALUES ($1, $2, $3) 
+    RETURNING email, password;`,
+    [faker.name.findName(), faker.internet.email(), hash],
+  );
+  newUser.rows[0].password = pass;
+  return newUser.rows[0];
 }
 
-describe("POST /api/auth/signin", () => {
+describe('POST /api/auth/signin', () => {
+  it('returns status 200 for valid access', async () => {
+    const newUser = await createUser();
 
-	it("returns status 200 for valid access", async () => {
-		const newUser = await createUser();
+    const bodyData = {
+      email: newUser.email,
+      password: newUser.password,
+    };
 
-		const bodyData = {
-			email: newUser.email,
-			password: newUser.password
-		};
+    const result = await request.post('/api/auth/signin').send(bodyData);
+    expect(result.status).toEqual(200);
+  });
 
-		const result = await request.post("/api/auth/signin").send(bodyData);
-		expect(result.status).toEqual(200);
-	});
+  it('returns status 400 for invalid format properties', async () => {
+    const bodyData = {};
+    const result = await request.post('/api/auth/signin').send(bodyData);
+    expect(result.status).toEqual(400);
+  });
 
-	it("returns status 400 for invalid format properties", async () => {
-		const bodyData = {};
-		const result = await request.post("/api/auth/signin").send(bodyData);
-		expect(result.status).toEqual(400);
-	});
+  it('returns status 401 for invalid password', async () => {
+    const newUser = await createUser();
 
-	it("returns status 401 for invalid password", async () => {
-		const newUser = await createUser();
+    const bodyData = {
+      email: newUser.email,
+      password: `${newUser.password}WRONG`,
+    };
 
-		const bodyData = {
-			email: newUser.email,
-			password: newUser.password + "WRONG"
-		};
-		
-		const result = await request.post("/api/auth/signin").send(bodyData);
-	
-		expect(result.status).toEqual(401);
-	});
+    const result = await request.post('/api/auth/signin').send(bodyData);
 
-	it("returns status 401 for invalid email", async () => {
-		const bodyData = {
-			email: "qualquercoisa@email.com",
-			password: "SenhaQuePassaNoTesteDeForça@123"
-		};
-		
-		const result = await request.post("/api/auth/signin").send(bodyData);
-	
-		expect(result.status).toEqual(401);
-	});
+    expect(result.status).toEqual(401);
+  });
 
-	it("creates a session for valid access", async () => {
-		const newUser = await createUser();
+  it('returns status 401 for invalid email', async () => {
+    const bodyData = {
+      email: 'qualquercoisa@email.com',
+      password: 'SenhaQuePassaNoTesteDeForça@123',
+    };
 
-		const bodyData = {
-			email: newUser.email,
-			password: newUser.password
-		};
+    const result = await request.post('/api/auth/signin').send(bodyData);
 
-		const sessions = await connection.query(`SELECT * FROM sessions`);
-		expect(sessions.rows.length).toEqual(0);
+    expect(result.status).toEqual(401);
+  });
 
-		await request.post("/api/auth/signin").send(bodyData);
+  it('creates a session for valid access', async () => {
+    const newUser = await createUser();
 
-		const newSessions = await connection.query(`SELECT * FROM sessions;`);
-		expect(newSessions.rows.length).toEqual(1);
-	});
+    const bodyData = {
+      email: newUser.email,
+      password: newUser.password,
+    };
 
-	it("returns a token for valid access", async () => {
-		const newUser = await createUser();
-		const bodyData = {
-			email: newUser.email,
-			password: newUser.password
-		};
+    const sessions = await connection.query('SELECT * FROM sessions');
+    expect(sessions.rows.length).toEqual(0);
 
-		const { body } = await request.post("/api/auth/signin").send(bodyData);
+    await request.post('/api/auth/signin').send(bodyData);
 
-		const lastSession = await connection.query(`
-			SELECT * FROM sessions 
-		  	ORDER BY id DESC 
-		  	LIMIT 1;`
-		);
+    const newSessions = await connection.query('SELECT * FROM sessions;');
+    expect(newSessions.rows.length).toEqual(1);
+  });
 
-		const { token } = lastSession.rows[0];
-		expect(body.token).toEqual(token);
-	});
+  it('returns a token for valid access', async () => {
+    const newUser = await createUser();
+    const bodyData = {
+      email: newUser.email,
+      password: newUser.password,
+    };
 
+    const { body } = await request.post('/api/auth/signin').send(bodyData);
+
+    const lastSession = await connection.query(
+      'SELECT * FROM sessions ORDER BY id DESC LIMIT 1;',
+    );
+
+    const { token } = lastSession.rows[0];
+    expect(body.token).toEqual(token);
+  });
 });
