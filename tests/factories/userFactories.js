@@ -3,7 +3,7 @@ import faker from 'faker/locale/pt_BR';
 import connection from '../../src/database/database.js';
 
 export default async function createUser() {
-  const pass = faker.internet.password(12);
+  const pass = `${faker.internet.password(12)}@123`;
   const hash = bcrypt.hashSync(pass, 10);
 
   const newUser = await connection.query(

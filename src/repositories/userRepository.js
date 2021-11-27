@@ -6,7 +6,6 @@ export async function findByEmail(email) {
     'SELECT * FROM "users" WHERE "email" = $1',
     [email],
   );
-  console.log(user);
   return user.rows[0];
 }
 

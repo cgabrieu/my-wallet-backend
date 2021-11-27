@@ -8,7 +8,7 @@ export async function signIn(req, res) {
     const { email, password } = req.body;
 
     if (userSchemas.signIn.validate(req.body).error) {
-      return res.status(400).send('Dados inválidos.');
+      return res.sendStatus(400);
     }
 
     const token = await userService.authenticate(email, password);
@@ -16,10 +16,9 @@ export async function signIn(req, res) {
       return res.status(200).send({ token });
     }
 
-    return res.status(401).send('E-mail ou senha inválidos.');
+    return res.sendStatus(401);
   } catch (error) {
-    console.log(error);
-    return res.status(500);
+    return res.sendStatus(500);
   }
 }
 
@@ -28,7 +27,7 @@ export async function signUp(req, res) {
     const { name, email, password } = req.body;
 
     if (userSchemas.signUp.validate(req.body).error) {
-      return res.status(400).send('Sua senha precisa ser mais forte.');
+      return res.sendStatus(400);
     }
 
     const hasUser = await connection.query(
@@ -37,7 +36,7 @@ export async function signUp(req, res) {
       [email],
     );
     if (hasUser.rowCount > 0) {
-      return res.status(409).send('Usuário já existente.');
+      return res.sendStatus(409);
     }
 
     const hashPassword = bcrypt.hashSync(password, 10);
@@ -49,7 +48,7 @@ export async function signUp(req, res) {
       [name, email, hashPassword],
     );
 
-    return res.status(201).send('Conta criada com sucesso.');
+    return res.sendStatus(201);
   } catch (error) {
     return res.status(500);
   }

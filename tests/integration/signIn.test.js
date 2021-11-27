@@ -1,6 +1,8 @@
 /* eslint-disable no-undef */
 import '../../src/setup.js';
 import supertest from 'supertest';
+import faker from 'faker/locale/pt_BR';
+import jwt from 'jsonwebtoken';
 import app from '../../src/app.js';
 import connection from '../../src/database/database.js';
 import clearDatabase from '../utils/database.js';
@@ -20,12 +22,7 @@ describe('POST /auth/sign-in', () => {
   it('returns status 200 for valid access', async () => {
     const newUser = await createUser();
 
-    const bodyData = {
-      email: newUser.email,
-      password: newUser.password,
-    };
-
-    const result = await request.post(signInRoute).send(bodyData);
+    const result = await request.post(signInRoute).send(newUser);
     expect(result.status).toEqual(200);
   });
 
@@ -50,7 +47,7 @@ describe('POST /auth/sign-in', () => {
 
   it('returns status 401 for invalid email', async () => {
     const bodyData = {
-      email: 'qualquercoisa@email.com',
+      email: faker.internet.email(),
       password: 'SenhaQuePassaNoTesteDeForça@123',
     };
 
@@ -70,26 +67,22 @@ describe('POST /auth/sign-in', () => {
     const sessions = await connection.query('SELECT * FROM sessions');
     expect(sessions.rows.length).toEqual(0);
 
-    await request.post('/auth/sign-in').send(bodyData);
+    await request.post(signInRoute).send(bodyData);
 
     const newSessions = await connection.query('SELECT * FROM sessions;');
     expect(newSessions.rows.length).toEqual(1);
   });
 
-  it('returns a token for valid access', async () => {
+  it('returns a valid jwt token for valid access', async () => {
     const newUser = await createUser();
-    const bodyData = {
-      email: newUser.email,
-      password: newUser.password,
-    };
 
-    const { body } = await request.post(signInRoute).send(bodyData);
+    const { body } = await request.post(signInRoute).send(newUser);
 
-    const lastSession = await connection.query(
-      'SELECT * FROM sessions ORDER BY id DESC LIMIT 1;',
-    );
+    const sessions = await connection.query('SELECT * FROM sessions');
+    const { userId } = sessions.rows[0];
 
-    const { token } = lastSession.rows[0];
-    expect(body.token).toEqual(token);
+    jwt.verify(body.token, process.env.JWT_SECRET, (err, decoded) => {
+      expect(decoded.userId).toEqual(userId);
+    });
   });
 });
