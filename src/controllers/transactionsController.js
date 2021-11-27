@@ -3,7 +3,7 @@ import { validateTransaction } from '../schemas/transactionSchemas.js';
 
 export async function transactions(req, res) {
   try {
-    const authorization = req.header('authorization');
+    const authorization = req.header('Authorization');
     const token = authorization?.replace('Bearer ', '');
 
     const session = await connection.query(
