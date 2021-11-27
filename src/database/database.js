@@ -1,16 +1,24 @@
 import pg from 'pg';
-import dotenv from 'dotenv';
 
 const { Pool } = pg;
 
-dotenv.config({ path: '.env' });
-
-const connection = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
+let connData = {
   user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-});
+  password: process.env.DB_PASS,
+  port: process.env.DB_PORT,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+};
+
+if (process.env.NODE_ENV === 'prod') {
+  connData = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false,
+    },
+  };
+}
+
+const connection = new Pool(connData);
 
 export default connection;
