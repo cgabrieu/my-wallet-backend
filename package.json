@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "NODE_ENV=prod node ./src/server.js",
-    "start:dev": "NODE_ENV=dev nodemon ./src/server.js",
+    "start:dev": "NODE_ENV=dev npx nodemon ./src/server.js",
     "start:test": "NODE_ENV=test node ./src/server.js",
     "test": "NODE_ENV=test npx jest",
     "test:watch": "NODE_ENV=test npx jest -i --watch"
@@ -36,6 +36,7 @@
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-import": "^2.25.2",
     "husky": "7.0.4",
+    "nodemon": "^2.0.15",
     "prettier": "2.4.1"
   }
 }

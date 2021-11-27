@@ -10,9 +10,7 @@ export async function authenticate(email, password) {
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET);
     await sessionRepository.create(user);
 
-    return {
-      token,
-    };
+    return token;
   }
   return null;
 }
