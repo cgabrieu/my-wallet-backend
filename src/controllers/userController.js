@@ -19,7 +19,6 @@ export async function signIn(req, res) {
 
     return res.status(401).send('E-mail ou senha inválidos.');
   } catch (error) {
-    console.log(error);
     return res.status(500);
   }
 }
