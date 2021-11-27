@@ -5,8 +5,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon src/server.js"
+    "start": "NODE_ENV=prod node ./src/server.js",
+    "start:dev": "NODE_ENV=dev nodemon ./src/server.js",
+    "start:test": "NODE_ENV=test node ./src/server.js",
+    "test": "NODE_ENV=test npx jest",
+    "test:watch": "NODE_ENV=test npx jest -i --watch"
   },
   "keywords": [],
   "author": "",
@@ -23,9 +26,9 @@
     "faker": "^5.5.3",
     "jest": "^27.3.1",
     "joi": "^17.4.2",
+    "jsonwebtoken": "^8.5.1",
     "pg": "^8.7.1",
-    "supertest": "^6.1.6",
-    "uuid": "^8.3.2"
+    "supertest": "^6.1.6"
   },
   "devDependencies": {
     "eslint": "^7.32.0",

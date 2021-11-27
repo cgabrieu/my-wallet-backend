@@ -1,8 +1,22 @@
 import connection from '../database/database.js';
+import { validateTransaction } from '../schemas/transactionSchemas.js';
 
-import { validateTransaction } from '../validations/transaction.js';
+export async function transactions(req, res) {
+  try {
+    const result = await connection.query(
+      `SELECT * FROM transactions 
+      WHERE "userId" = $1 
+      ORDER BY id ASC;`,
+      [req.userId],
+    );
 
-export default async function postNewTransaction(req, res) {
+    return res.status(200).send(result.rows);
+  } catch (error) {
+    return res.status(500);
+  }
+}
+
+export async function newTransaction(req, res) {
   try {
     const authorization = req.header('authorization');
     const token = authorization?.replace('Bearer ', '');
@@ -12,9 +26,8 @@ export default async function postNewTransaction(req, res) {
     if (validateTransaction.validate(req.body).error) { return res.status(400).send('Dados inválidos.'); }
 
     const session = await connection.query(
-      `
-            SELECT "userId" FROM sessions
-            WHERE token = $1;`,
+      `SELECT "userId" FROM sessions
+      WHERE token = $1;`,
       [token],
     );
 
@@ -23,10 +36,9 @@ export default async function postNewTransaction(req, res) {
     const { userId } = session.rows[0];
 
     await connection.query(
-      `
-            INSERT INTO transactions
-            ("userId", description, value)
-            VALUES ($1, $2, $3);`,
+      `INSERT INTO transactions
+      ("userId", description, value)
+      VALUES ($1, $2, $3);`,
       [userId, description, value],
     );
 
