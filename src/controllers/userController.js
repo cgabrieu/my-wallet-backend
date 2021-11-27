@@ -11,14 +11,14 @@ export async function signIn(req, res) {
       return res.status(400).send('Dados inválidos.');
     }
 
-    const { token } = await userService.authenticate(email, password);
-
+    const token = await userService.authenticate(email, password);
     if (token) {
       return res.status(200).send({ token });
     }
 
     return res.status(401).send('E-mail ou senha inválidos.');
   } catch (error) {
+    console.log(error);
     return res.status(500);
   }
 }
