@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-export default async function authenticationJWT(req, res, next) {
+export default async function authenticationMiddleware(req, res, next) {
   const authorization = req.header('Authorization');
   const token = authorization?.replace('Bearer ', '');
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {

@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import * as userController from './controllers/userController.js';
 import * as transactionsController from './controllers/transactionsController.js';
+import authenticationMiddleware from './middlewares/authenticationMiddleware.js';
 
 const app = express();
 
@@ -11,7 +12,7 @@ app.use(express.json());
 app.post('/auth/sign-up', userController.signUp);
 app.post('/auth/sign-in', userController.signIn);
 
-app.post('/transactions', transactionsController.newTransaction);
-app.get('/transactions', transactionsController.transactions);
+app.post('/transactions', authenticationMiddleware, transactionsController.newTransaction);
+app.get('/transactions', authenticationMiddleware, transactionsController.transactions);
 
 export default app;
