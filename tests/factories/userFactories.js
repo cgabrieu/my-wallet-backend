@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import faker from 'faker/locale/pt_BR';
-import connection from '../../src/database/database';
+import connection from '../../src/database/database.js';
 
 export default async function createUser() {
   const pass = faker.internet.password(12);
