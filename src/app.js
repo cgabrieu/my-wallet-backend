@@ -12,7 +12,15 @@ app.use(express.json());
 app.post('/auth/sign-up', userController.signUp);
 app.post('/auth/sign-in', userController.signIn);
 
-app.post('/transactions', authenticationMiddleware, transactionsController.newTransaction);
-app.get('/transactions', authenticationMiddleware, transactionsController.transactions);
+app.post(
+  '/transactions',
+  authenticationMiddleware,
+  transactionsController.addTransaction,
+);
+app.get(
+  '/transactions',
+  authenticationMiddleware,
+  transactionsController.transactions,
+);
 
 export default app;
