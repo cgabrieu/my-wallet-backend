@@ -1,22 +1,19 @@
 /* eslint-disable no-undef */
+import '../../src/setup.js';
 import bcrypt from 'bcrypt';
 import faker from 'faker/locale/pt_BR';
 import supertest from 'supertest';
-import app from '../src/app.js';
-import connection from '../src/database/database.js';
+import app from '../../src/app.js';
+import connection from '../../src/database/database.js';
+import clearDatabase from '../utils/database.js';
 
 const request = supertest(app);
 
-// eslint-disable-next-line no-undef
 afterAll(() => {
   connection.end();
 });
 
-// eslint-disable-next-line no-undef
-beforeEach(async () => {
-  await connection.query('DELETE FROM users;');
-  await connection.query('DELETE FROM sessions;');
-});
+beforeEach(clearDatabase);
 
 async function createUser() {
   const pass = faker.internet.password(8);
@@ -32,7 +29,7 @@ async function createUser() {
   return newUser.rows[0];
 }
 
-describe('POST /api/auth/signin', () => {
+describe('POST /auth/sign-in', () => {
   it('returns status 200 for valid access', async () => {
     const newUser = await createUser();
 
@@ -41,13 +38,13 @@ describe('POST /api/auth/signin', () => {
       password: newUser.password,
     };
 
-    const result = await request.post('/api/auth/signin').send(bodyData);
+    const result = await request.post('/auth/sign-in').send(bodyData);
     expect(result.status).toEqual(200);
   });
 
   it('returns status 400 for invalid format properties', async () => {
     const bodyData = {};
-    const result = await request.post('/api/auth/signin').send(bodyData);
+    const result = await request.post('/auth/sign-in').send(bodyData);
     expect(result.status).toEqual(400);
   });
 
@@ -59,7 +56,7 @@ describe('POST /api/auth/signin', () => {
       password: `${newUser.password}WRONG`,
     };
 
-    const result = await request.post('/api/auth/signin').send(bodyData);
+    const result = await request.post('/auth/sign-in').send(bodyData);
 
     expect(result.status).toEqual(401);
   });
@@ -70,7 +67,7 @@ describe('POST /api/auth/signin', () => {
       password: 'SenhaQuePassaNoTesteDeForça@123',
     };
 
-    const result = await request.post('/api/auth/signin').send(bodyData);
+    const result = await request.post('/auth/sign-in').send(bodyData);
 
     expect(result.status).toEqual(401);
   });
@@ -86,7 +83,7 @@ describe('POST /api/auth/signin', () => {
     const sessions = await connection.query('SELECT * FROM sessions');
     expect(sessions.rows.length).toEqual(0);
 
-    await request.post('/api/auth/signin').send(bodyData);
+    await request.post('/auth/sign-in').send(bodyData);
 
     const newSessions = await connection.query('SELECT * FROM sessions;');
     expect(newSessions.rows.length).toEqual(1);
@@ -99,7 +96,7 @@ describe('POST /api/auth/signin', () => {
       password: newUser.password,
     };
 
-    const { body } = await request.post('/api/auth/signin').send(bodyData);
+    const { body } = await request.post('/auth/sign-in').send(bodyData);
 
     const lastSession = await connection.query(
       'SELECT * FROM sessions ORDER BY id DESC LIMIT 1;',
