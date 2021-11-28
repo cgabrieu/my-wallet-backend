@@ -14,8 +14,16 @@ export async function select(userId) {
 export async function add(userId, description, value) {
   await connection.query(
     `INSERT INTO transactions
-      ("userId", description, value)
-      VALUES ($1, $2, $3);`,
+    ("userId", description, value)
+    VALUES ($1, $2, $3);`,
     [userId, description, value],
+  );
+}
+
+export async function remove(transactionId) {
+  await connection.query(
+    `DELETE FROM transactions
+    WHERE id = $1;`,
+    [transactionId],
   );
 }
