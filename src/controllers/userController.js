@@ -1,7 +1,6 @@
-import bcrypt from 'bcrypt';
-import connection from '../database/database.js';
 import * as userSchemas from '../schemas/userSchemas.js';
 import * as userService from '../services/userServices.js';
+import * as userRepository from '../repositories/userRepository.js';
 
 export async function signIn(req, res) {
   try {
@@ -30,23 +29,13 @@ export async function signUp(req, res) {
       return res.sendStatus(400);
     }
 
-    const hasUser = await connection.query(
-      `SELECT * FROM users
-      WHERE email = $1;`,
-      [email],
-    );
-    if (hasUser.rowCount > 0) {
+    const user = userRepository.findByEmail(email);
+
+    if (user.rowCount > 0) {
       return res.sendStatus(409);
     }
 
-    const hashPassword = bcrypt.hashSync(password, 10);
-
-    await connection.query(
-      `INSERT INTO users
-      (name, email, password)
-      VALUES ($1, $2, $3);`,
-      [name, email, hashPassword],
-    );
+    await userRepository.createUser(name, email, password);
 
     return res.sendStatus(201);
   } catch (error) {
