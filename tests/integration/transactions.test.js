@@ -36,4 +36,39 @@ describe('POST /transactions', () => {
       .send(body);
     expect(result.status).toEqual(201);
   });
+
+  it('returns status 400 for invalid body', async () => {
+    const token = await userFactories.createToken();
+    console.log(faker.datatype.number({
+      min: -100,
+      max: 0,
+    }));
+    let body = {
+      value: faker.datatype.number({
+        min: -100,
+        max: 0,
+      }),
+      description: faker.commerce.productAdjective(),
+    };
+
+    let result = await request
+      .post(transactionsRoute)
+      .set('Authorization', `Bearer ${token}`)
+      .send(body);
+    expect(result.status).toEqual(201);
+
+    body = {
+      value: faker.datatype.number({
+        min: 0,
+        max: 999999,
+      }),
+      description: faker.commerce.productAdjective(),
+    };
+
+    result = await request
+      .post(transactionsRoute)
+      .set('Authorization', `Bearer ${token}`)
+      .send(body);
+    expect(result.status).toEqual(201);
+  });
 });
