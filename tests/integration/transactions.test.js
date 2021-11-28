@@ -13,8 +13,8 @@ const transactionsRoute = '/transactions';
 
 const validBody = {
   value: faker.datatype.number({
-    min: 1,
-    max: 999999,
+    min: -999,
+    max: 999,
   }),
   description: faker.commerce.productAdjective(),
 };
@@ -40,10 +40,7 @@ describe('POST /transactions', () => {
   it('returns status 400 for invalid body', async () => {
     const token = await userFactories.createToken();
     const body = {
-      value: faker.datatype.number({
-        min: -100,
-        max: 0,
-      }),
+      value: faker.commerce.productMaterial(),
       description: faker.commerce.productAdjective(),
     };
 
@@ -69,8 +66,8 @@ describe('POST /transactions', () => {
     const token = await userFactories.createToken();
     const body = {
       value: faker.datatype.number({
-        min: 1,
-        max: 9999,
+        min: -999,
+        max: 999,
       }),
       description: faker.lorem.paragraph(),
     };
