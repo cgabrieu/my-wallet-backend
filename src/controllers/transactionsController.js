@@ -27,13 +27,15 @@ export async function addTransaction(req, res) {
 
 export async function removeTransaction(req, res) {
   try {
-    const { transactionId } = req.body;
+    const { transactionId } = req.params;
 
-    if (transactionsSchemas.remove.validate(req.body).error) return res.sendStatus(400);
+    if (transactionsSchemas.remove.validate(req.params).error) return res.sendStatus(400);
 
-    await transactionsRepository.remove(transactionId);
+    const result = await transactionsRepository.remove(transactionId);
 
-    return res.sendStatus(201);
+    if (!result) return res.sendStatus(404);
+
+    return res.sendStatus(200);
   } catch (error) {
     return res.sendStatus(500);
   }

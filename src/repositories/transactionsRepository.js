@@ -21,9 +21,10 @@ export async function add(userId, description, value) {
 }
 
 export async function remove(transactionId) {
-  await connection.query(
+  const result = await connection.query(
     `DELETE FROM transactions
     WHERE id = $1;`,
     [transactionId],
   );
+  return (result.rowCount > 0);
 }
