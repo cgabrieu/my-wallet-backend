@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import app from '../../src/app.js';
 import connection from '../../src/database/database.js';
 import clearDatabase from '../utils/database.js';
-import createUser from '../factories/userFactories.js';
+import * as userFactories from '../factories/userFactories.js';
 
 const request = supertest(app);
 
@@ -20,7 +20,8 @@ beforeEach(clearDatabase);
 
 describe('POST /auth/sign-in', () => {
   it('returns status 200 for valid access', async () => {
-    const newUser = await createUser();
+    const newUser = await userFactories.createUser();
+    delete newUser.id;
 
     const result = await request.post(signInRoute).send(newUser);
     expect(result.status).toEqual(200);
@@ -33,7 +34,7 @@ describe('POST /auth/sign-in', () => {
   });
 
   it('returns status 401 for invalid password', async () => {
-    const newUser = await createUser();
+    const newUser = await userFactories.createUser();
 
     const bodyData = {
       email: newUser.email,
@@ -57,7 +58,7 @@ describe('POST /auth/sign-in', () => {
   });
 
   it('creates a session for valid access', async () => {
-    const newUser = await createUser();
+    const newUser = await userFactories.createUser();
 
     const bodyData = {
       email: newUser.email,
@@ -74,11 +75,12 @@ describe('POST /auth/sign-in', () => {
   });
 
   it('returns a valid jwt token for valid access', async () => {
-    const newUser = await createUser();
+    const newUser = await userFactories.createUser();
+    delete newUser.id;
 
     const { body } = await request.post(signInRoute).send(newUser);
 
-    const sessions = await connection.query('SELECT * FROM sessions');
+    const sessions = await connection.query('SELECT * FROM sessions;');
     const { userId } = sessions.rows[0];
 
     jwt.verify(body.token, process.env.JWT_SECRET, (err, decoded) => {
