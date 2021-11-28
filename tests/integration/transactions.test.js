@@ -24,7 +24,7 @@ describe('POST /transactions', () => {
 
     const body = {
       value: faker.datatype.number({
-        min: 0,
+        min: 1,
         max: 999999,
       }),
       description: faker.commerce.productAdjective(),
@@ -39,11 +39,7 @@ describe('POST /transactions', () => {
 
   it('returns status 400 for invalid body', async () => {
     const token = await userFactories.createToken();
-    console.log(faker.datatype.number({
-      min: -100,
-      max: 0,
-    }));
-    let body = {
+    const body = {
       value: faker.datatype.number({
         min: -100,
         max: 0,
@@ -51,24 +47,38 @@ describe('POST /transactions', () => {
       description: faker.commerce.productAdjective(),
     };
 
-    let result = await request
+    const result = await request
       .post(transactionsRoute)
       .set('Authorization', `Bearer ${token}`)
       .send(body);
-    expect(result.status).toEqual(201);
+    expect(result.status).toEqual(400);
+  });
 
-    body = {
+  it('returns status 400 empty body', async () => {
+    const token = await userFactories.createToken();
+    const body = {};
+
+    const result = await request
+      .post(transactionsRoute)
+      .set('Authorization', `Bearer ${token}`)
+      .send(body);
+    expect(result.status).toEqual(400);
+  });
+
+  it('returns status 400 invalid description', async () => {
+    const token = await userFactories.createToken();
+    const body = {
       value: faker.datatype.number({
         min: 0,
-        max: 999999,
+        max: 9999,
       }),
-      description: faker.commerce.productAdjective(),
+      description: faker.lorem.paragraph(),
     };
 
-    result = await request
+    const result = await request
       .post(transactionsRoute)
       .set('Authorization', `Bearer ${token}`)
       .send(body);
-    expect(result.status).toEqual(201);
+    expect(result.status).toEqual(400);
   });
 });

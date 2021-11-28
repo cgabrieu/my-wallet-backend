@@ -3,6 +3,6 @@ import joi from 'joi';
 
 export const validateTransaction = joi.object({
   description: joi.string().min(3).max(50).required(),
-  value: joi.number().min(3).max(50).integer()
+  value: joi.number().min(1).integer()
     .required(),
 });
