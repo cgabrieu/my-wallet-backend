@@ -10,9 +10,12 @@ export async function signIn(req, res) {
       return res.sendStatus(400);
     }
 
-    const token = await userService.authenticate(email, password);
-    if (token) {
-      return res.status(200).send({ token });
+    const user = await userService.authenticate(email, password);
+    if (user) {
+      return res.status(200).send({
+        name: user.name,
+        token: user.token,
+      });
     }
 
     return res.sendStatus(401);
