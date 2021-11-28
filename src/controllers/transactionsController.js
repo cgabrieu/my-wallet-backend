@@ -1,4 +1,4 @@
-import { validateTransaction } from '../schemas/transactionSchemas.js';
+import * as transactionsSchemas from '../schemas/transactionSchemas.js';
 import * as transactionsRepository from '../repositories/transactionsRepository.js';
 
 export async function transactions(req, res) {
@@ -15,9 +15,23 @@ export async function addTransaction(req, res) {
   try {
     const { value, description } = req.body;
 
-    if (validateTransaction.validate(req.body).error) return res.sendStatus(400);
+    if (transactionsSchemas.add.validate(req.body).error) return res.sendStatus(400);
 
     await transactionsRepository.add(req.userId, description, value);
+
+    return res.sendStatus(201);
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+}
+
+export async function removeTransaction(req, res) {
+  try {
+    const { transactionId } = req.body;
+
+    if (transactionsSchemas.remove.validate(req.body).error) return res.sendStatus(400);
+
+    await transactionsRepository.remove(transactionId);
 
     return res.sendStatus(201);
   } catch (error) {
