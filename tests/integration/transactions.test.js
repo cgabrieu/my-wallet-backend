@@ -6,6 +6,7 @@ import app from '../../src/app.js';
 import connection from '../../src/database/database.js';
 import clearDatabase from '../utils/database.js';
 import * as userFactories from '../factories/userFactories.js';
+import createTransaction from '../factories/transactionsFactories.js';
 
 const request = supertest(app);
 
@@ -28,7 +29,7 @@ beforeEach(clearDatabase);
 
 describe('POST /transactions', () => {
   it('returns status 201 for transaction creation', async () => {
-    const token = await userFactories.createToken();
+    const { token } = await userFactories.createToken();
 
     const result = await request
       .post(transactionsRoute)
@@ -38,7 +39,7 @@ describe('POST /transactions', () => {
   });
 
   it('returns status 400 for invalid body', async () => {
-    const token = await userFactories.createToken();
+    const { token } = await userFactories.createToken();
     const body = {
       value: faker.commerce.productMaterial(),
       description: faker.commerce.productAdjective(),
@@ -52,7 +53,7 @@ describe('POST /transactions', () => {
   });
 
   it('returns status 400 empty body', async () => {
-    const token = await userFactories.createToken();
+    const { token } = await userFactories.createToken();
     const body = {};
 
     const result = await request
@@ -63,7 +64,7 @@ describe('POST /transactions', () => {
   });
 
   it('returns status 400 invalid description', async () => {
-    const token = await userFactories.createToken();
+    const { token } = await userFactories.createToken();
     const body = {
       value: faker.datatype.number({
         min: -999,
@@ -82,7 +83,7 @@ describe('POST /transactions', () => {
 
 describe('GET /transactions', () => {
   it('returns status 200 for valid header token', async () => {
-    const token = await userFactories.createToken();
+    const { token } = await userFactories.createToken();
 
     const result = await request
       .get(transactionsRoute)
@@ -97,5 +98,57 @@ describe('GET /transactions', () => {
       .set('Authorization', `Bearer ${faker.lorem.sentence()}`)
       .send(validBody);
     expect(result.status).toEqual(401);
+  });
+});
+
+describe('DELETE /transactions', () => {
+  it('returns status 200 for valid param', async () => {
+    const { userId, token } = await userFactories.createToken();
+
+    const transactionId = await createTransaction(userId);
+
+    const result = await request
+      .delete(`${transactionsRoute}/${transactionId}`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(result.status).toEqual(200);
+  });
+
+  it('returns status 400 for invalid param', async () => {
+    const { token } = await userFactories.createToken();
+
+    const transactionId = faker.datatype.number({
+      min: -10,
+      max: 0,
+    });
+
+    const result = await request
+      .delete(`${transactionsRoute}/${transactionId}`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(result.status).toEqual(400);
+  });
+
+  it('returns status 404 for empty param', async () => {
+    const { token } = await userFactories.createToken();
+
+    const result = await request
+      .delete(`${transactionsRoute}`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(result.status).toEqual(404);
+  });
+
+  it('returns status 404 for transaction already removed', async () => {
+    const { userId, token } = await userFactories.createToken();
+
+    const transactionId = await createTransaction(userId);
+
+    await request
+      .delete(`${transactionsRoute}/${transactionId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    const result = await request
+      .delete(`${transactionsRoute}/${transactionId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(result.status).toEqual(404);
   });
 });

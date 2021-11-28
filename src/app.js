@@ -23,4 +23,10 @@ app.get(
   transactionsController.transactions,
 );
 
+app.delete(
+  '/transactions/:transactionId',
+  authenticationMiddleware,
+  transactionsController.removeTransaction,
+);
+
 export default app;

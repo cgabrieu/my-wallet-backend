@@ -26,5 +26,8 @@ export async function createToken() {
     { expiresIn: 60 * 60 },
   );
 
-  return token;
+  return {
+    userId,
+    token,
+  };
 }
