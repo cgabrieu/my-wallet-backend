@@ -4,10 +4,7 @@
   <h4>This is the frontend repo, access the frontend repo <a href="https://github.com/cgabrieu/my-wallet-frontend">here</a>.</h4>
   <a href="https://mywallet-cgabrieu.vercel.app/">
     <img src="https://user-images.githubusercontent.com/25062334/144301107-9b86368f-6548-452b-8f82-37a70ca4fe98.gif">
-  </a>
-    <br />
-    <a href="https://mywallet-cgabrieu.vercel.app/">View the deploy</a>
-    <br />
+  <a/>
 </div>
   
 <br/>
@@ -88,9 +85,3 @@ npm run start:dev
 ```sh
 npm start
 ```
-  
-<br/>
-
-## Developer
-
-* [Carlos Gabriel](https://github.com/cgabrieu)
